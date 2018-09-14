@@ -1,0 +1,69 @@
+---
+title: "Conducting EDA on Corruption Data"
+author: "Andre Fernandes, Keenan Szulik, and Erik Hou"
+date: "`r format(Sys.time(),'%m/%d/%Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<!-- ################################### -->
+<!-- # Erik's section Begins -->
+<!-- ################################### -->
+
+### Introduction
+
+Fill in with information.
+
+```{r, echo=TRUE}
+source("utils/functions.R")
+df <- load_rda('data/Corrupt.Rdata')
+```
+
+### Univariate Analysis of Key Variables
+
+Fill in with information.
+
+```{r, echo=TRUE}
+
+```
+
+<!-- ################################### -->
+<!-- # Andre's section Begins -->
+<!-- ################################### -->
+
+### Analysis of Key Relationships
+
+Fill in with information.
+
+```{r, echo=TRUE}
+
+```
+
+<!-- ################################### -->
+<!-- # Keenan's section Begins -->
+<!-- ################################### -->
+
+### Analysis of Secondary Effects
+
+Fill in with information.
+
+```{r, echo=TRUE}
+
+```
+
+### Conclusion
+
+You can also embed plots, for example:
+
+```{r, echo=TRUE}
+
+```
+
+<style>
+    body .main-container {
+        max-width: 1600px;
+    }
+</style>
