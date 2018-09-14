@@ -44,6 +44,24 @@ set_directories <- function(author=author){
   return(work_dir)
 }
 
+#-----------------------------------------------------------------------------------
+# load_rda: 
+#
+#     description:
+#         loads rda and assigns it to user-defined variable
+#     parameters:
+#         @loc: string
+#     returns
+#         @df: dataframe
+#-----------------------------------------------------------------------------------
+
+load_rda <- function(loc="data/Corrupt.Rdata"){
+  
+  df <- as.data.frame(eval(as.name(load(loc))))
+  
+  return(df)
+}
+
 # HERE IS A TEMPLATE FOR FUNCTIONS
 #-----------------------------------------------------------------------------------
 # function_name: 
