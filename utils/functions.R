@@ -26,10 +26,11 @@ pacman::p_load(readr, ggplot2, dplyr, reshape, knitr, kableExtra)
 #     parameters:
 #         @author: string
 #     returns
-#         directory folder location
+#         @work_dir: directory folder location
 #-----------------------------------------------------------------------------------
 
 set_directories <- function(author=author){
+  
   if(author=="Andre"){
     work_dir <- "C:/Users/afern/Desktop/Git/Berkeley/w203/corruption_eda_w203"
   }else if(author=="Keenan"){
@@ -39,6 +40,7 @@ set_directories <- function(author=author){
   }else{
     stop(paste0(author,": Please add yourself to set_directories in functions.R in ~/utils/"))
   }
+  
   return(work_dir)
 }
 
