@@ -36,7 +36,7 @@ set_directories <- function(author=author){
   }else if(author=="Keenan"){
     work_dir <- "Please add yourself to set_directories in functions.R in ~/utils/"
   }else if(author=="Erik"){
-    work_dir <- "Please add yourself to set_directories in functions.R in ~/utils/"
+    work_dir <- "c:/other/mids/w203/homework/lab_1/corruption_eda_w203"
   }else{
     stop(paste0(author,": Please add yourself to set_directories in functions.R in ~/utils/"))
   }

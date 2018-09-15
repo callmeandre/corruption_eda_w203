@@ -15,20 +15,89 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Introduction
 
-Fill in with information.
-
+Load the data:
 ```{r, echo=TRUE}
 source("utils/functions.R")
 df <- load_rda('data/Corrupt.Rdata')
 ```
 
-### Univariate Analysis of Key Variables
+Overview of the data structure:
 
-Fill in with information.
+Number of observations in the dataset:
+```{r}
+nrow(df)
+```
 
-```{r, echo=TRUE}
+The variables in the dataset:
+```{r}
+str(df)
+```
+
+Summary of the dataset:
+```{r}
+summary(df)
+```
+
+Examine the first ten rows of the dataset:
+```{r}
+head(df, 10)
+```
+
+
+From the data summary, we see there are many NA values in the key variable field, such as violations and corruption. Also notice that, in the field prepost, we have blanks. 
+
+It is necessary to clean the data by taking out the records with the essential fields being blank or NA before starting analysis on the variables:
+
+```{r}
+df[df=="" | df=="NA"] = NA  #set all the blanks and "NA" to NA
+
+#exlcude the records having NAs in at least one of the essential fields
+df_clean = subset(df, !is.na(wbcode) & !is.na(prepost) & !is.na(violations) & !is.na(corruption))
 
 ```
+
+One last step before starting univariate analysis of key variables is to make sure in our cleaned dataset, we have exactly two records to each country, one pre and one post 2002.
+```{r}
+length(unique(df_clean$wbcode))  #the total number of distinct countries in the data set
+length(unique(df_clean[df_clean$prepost == "pre",]$wbcode))  #the total number of distinct countries in the data set with prepost == "pre"
+length(unique(df_clean[df_clean$prepost == "pos",]$wbcode))  #the total number of distinct countries in the data set with prepost == "pos"
+
+```
+
+
+### Univariate Analysis of Key Variables
+
+Noe we've verified we have a total of 149 countries with each of them having one pos and one pre record.
+
+We can start the univariate analysis.
+
+First is to look at the variable violations:
+
+```{r, echo=TRUE}
+summary(df_clean$violations)
+sd(df_clean$violations)
+```
+
+Make a histogram of the variable with 20 bins:
+```{r}
+hist(df_clean$violations,20,xlab = "Violations", main = "Histogram of violations")
+```
+
+Notice that the values seem to be very clustered close to zero a few out lier. Try to draw a histogram of $log(volations + 1)$ since there are many zeros in the dataset.
+
+```{r}
+hist(log(df_clean$violations+1),breaks = seq(-0.75,10,0.5)+0.5, ylim = c(0,50), xlab = "log(Violations+1)", main = "Histogram of violations")
+```
+
+Notice that the frequency distribution has two modes one in (-0.25,0.25) and one at (4.25,4.75). This probably is caused by the change of policy where there were more violations before 2002 and less violation after 2002.
+
+Two histograms of violations before and after the change of policy prove the assumption.
+```{r}
+hist(log(df_clean[df_clean$prepost == "pre",]$violations+1),breaks = seq(-0.75,10,0.5)+0.5, ylim = c(0,50), xlab = "log(Violations+1)", main = "Histogram of Violations before 2002")
+hist(log(df_clean[df_clean$prepost == "pos",]$violations+1),breaks = seq(-0.75,10,0.5)+0.5, ylim = c(0,50), xlab = "log(Violations+1)", main = "Histogram of Violations before 2002")
+```
+
+
 
 <!-- ################################### -->
 <!-- # Andre's section Begins -->
