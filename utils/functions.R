@@ -147,6 +147,48 @@ lm_eqn <- function(df, x, y, log=FALSE){
   }
 }
 
+#-----------------------------------------------------------------------------------
+# plot_vars: 
+#
+#     description:
+#         returns four view multiple with boxplot/scatter and histogram/density
+#
+#-----------------------------------------------------------------------------------
+
+plot_vars <- function(df=df, target, variable, var_type, facet_var){
+  if (var_type == 'cat'){
+    df_data <- as.data.frame(df)
+    df_data$target <- log(df_data[, target]+1)
+    df_data$variable <- as.factor(as.character(df_data[, variable]))
+    df_data$facet_var <- as.factor(as.character(df_data[, facet_var]))
+    df_data$facet_var <- factor(df_data$facet_var, levels=c("pre","pos"), labels=c("Before 2002","After 2002"))
+    
+    
+    p <- ggplot(df_data, aes(x=variable, y=target, color=variable)) + 
+      geom_boxplot() + guides(fill=FALSE)+ facet_grid(. ~ facet_var)+
+      labs(title = paste(target, "by", variable),x=variable, y=paste0("log(",target, "+1)"))  + theme(legend.position="none")
+    p_hist <- ggplot(df_data, aes(x=variable)) + geom_bar(fill='darkgoldenrod1', alpha=.5) +
+      facet_grid(. ~ facet_var)+labs(title = paste("Histogram for", variable), x=variable)
+    multiplot(p, p_hist, cols=1)
+    
+  }
+  
+  if (var_type == 'numeric'){
+    df_data <- as.data.frame(df)
+    df_data$target <- log(df_data[, target]+1)
+    df_data$facet_var <- as.factor(as.character(df_data[, facet_var]))
+    df_data$facet_var <- factor(df_data$facet_var, levels=c("pre","pos"), labels=c("Before 2002","After 2002"))
+    
+    p <- ggplot(df_data, aes(y=target, x=eval(as.name(variable)))) + 
+      geom_point()+ facet_grid(. ~ facet_var)+ geom_smooth(method=lm,  linetype="dashed",
+                                                           color="darkred", fill="blue")+labs(title = paste0("log(",target, "+1) ", "by ", variable), x=variable, y=paste0("log(",target, "+1)")) 
+    den <- ggplot(df_data, aes(x=eval(as.name(variable)))) + geom_density(fill='darkgoldenrod1', alpha=.5) +
+      facet_grid(. ~ facet_var)+labs(title = paste("Density Plot for", variable), x=variable)
+    multiplot(p, den, cols=1)
+  }
+  
+}
+
 # HERE IS A TEMPLATE FOR FUNCTIONS
 #-----------------------------------------------------------------------------------
 # function_name: 
