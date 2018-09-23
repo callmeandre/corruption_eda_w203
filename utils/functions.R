@@ -121,6 +121,32 @@ plot_correlation <- function(df_clean, min_unique){
                      diag=FALSE, number.cex=.5, tl.cex=.7)
 }
 
+#-----------------------------------------------------------------------------------
+# lm_eqn: 
+#
+#     description:
+#         returns equation for the linear model
+#
+#-----------------------------------------------------------------------------------
+
+lm_eqn <- function(df, x, y, log=FALSE){
+  if (log==TRUE){
+    m <- lm(eval(as.name(y)) ~ eval(as.name(x)), df);
+    eq <- substitute(italic(y) == a + b %.% italic(x)*","~~italic(r)^2~"="~r2, 
+                     list(a = format(coef(m)[1], digits = 2), 
+                          b = format(coef(m)[2], digits = 2), 
+                          r2 = format(summary(m)$r.squared, digits = 3)))
+    as.character(as.expression(eq)); 
+  } else{
+    m <- lm(eval(as.name(y)) ~ eval(as.name(x)), df);
+    eq <- substitute(italic(y) == a + b %.% italic(x)*","~~italic(r)^2~"="~r2, 
+                     list(a = format(coef(m)[1], digits = 2), 
+                          b = format(coef(m)[2], digits = 2), 
+                          r2 = format(summary(m)$r.squared, digits = 3)))
+    as.character(as.expression(eq));
+  }
+}
+
 # HERE IS A TEMPLATE FOR FUNCTIONS
 #-----------------------------------------------------------------------------------
 # function_name: 
