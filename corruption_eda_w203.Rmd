@@ -183,13 +183,170 @@ Several key feature of the variable, corruption:
 <!-- # Andre's section Begins -->
 <!-- ################################### -->
 
-### Analysis of Key Relationships
+## Analysis of Key Relationships
 
-Fill in with information.
+In this section, we will be conducting multivariate analysis on our corruption data. This section will be divided into two segments comprised of __correlations for numerical variables__ and a deeper dive into variable relationships while observing __prepost__ variable.
 
-```{r, echo=TRUE}
+### Analyzing correlations among continuous variables
+
+#### All line items
+
+Here, we do a quick look at correlation of the numerical variables. It appears that most data is static between the two snapshot dates (as mentioned above).
+
+1. Violations and fines are perfectly correlated, so they tell us the same information about the data. We will check to see if they are identical later in this analysis.
+2. Since we know that the prepost variable captures a time element, we will be viewing the correlations in each of the _pre_ and _pos_ subset groups
+3. Staff, Spouse, and Car Total have a high positive correlation, which makes sense when we think of the semantic meaning of these variables.
+4. GDP and Corruption have a very high negative correlation. This is not a surprising relationship since it's a common hypothesis in the field.
+5. There are many other relationships to look at, but for the sake of brevity, we will end the analysis into the combined data correlations here.
+
+
+_The plot_correlation function was moved to the functions.R file_
+
+```{r, echo=TRUE, fig.width=13, fig.height=7}
+
+# all lines
+plot_correlation(df_clean, 10)
 
 ```
+
+#### Pre and Post 2002
+
+1. The interesting observation from comparing __pre__ and __post__ 2002 correlations is that __milaid__ and __totaid__ show relatively high positive correlations with __violations__ and __fines__. During the __post 2002__ period, that correlation is very weak.
+2. There's a shortage of information about the data, so we will not be able to explain why the correlations are so different between the beforementioned variables during the two snapshots of time
+
+Here, we will subset out data to _prepost == 'pre'_.
+
+```{r, echo=TRUE, fig.width=13, fig.height=7}
+
+# pre lines
+plot_correlation(df_clean %>% filter(prepost=='pre'), 10)
+
+```
+
+Here, we will subset out data to _prepost == 'pos'_.
+
+```{r, echo=TRUE, fig.width=13, fig.height=7}
+
+# post lines
+plot_correlation(df_clean %>% filter(prepost=='pos'), 10)
+
+```
+
+#### Looking further into the relationship between violations and fines
+
+We observed a very strong correlation between __violations__ and __fines__, so now let's plot a scatterplot with these two variables and add the bet fit line. Please note that we saw the correlation metrics prior to even adding a log transformation, so we will keep the variables as is for this graph.
+
+The variables indeed appear to be perfectly correlated. This makes sense since fines are likely violations multiplied by a scalar.
+```{r, echo=TRUE, fig.width=13, fig.height=7}
+
+# regular
+plot_scatter <- ggplot(df_clean, aes(x=fines, y=violations)) + 
+                    geom_point()+ geom_smooth(method=lm,  linetype="dashed", color="darkred", fill="blue")+ 
+                    geom_text(x = 40000, y = 2000, label = lm_eqn(df_clean, 'fines', 'violations'), parse = TRUE)+
+                    labs(title = "Scatter Plot for Violations and Fines with Linear Model")
+plot(plot_scatter)
+
+```
+
+### Deep dive into variable relationships with violations while considering pre-post 2002 timestamp
+
+In this section, we will analyze variables that we believe are important. We will not cover all variable for brevity.
+
+#### Region
+
+One of the key categorical variables to observe is __region__. Although the provided data set only provides an integer factor for the regions, we were able to use the regional indicators to map the integer factors to actual region names. Also, please note that the African country of __Zaire__ had a missing value for __region__. Sice we were able to do a quick internet search and discovered that __Zaire__ is in __Africa__, we fixed the data when creating the __region_clean__ variable.
+
+What we were able to observe:
+
+1. North America region has the lowest mean __log(violations+1)__ before and after 2002.
+2. Middle East region has the largest interquartile range before and after 2002.
+3. The target variable is much lower after 2002 (as we would expect since countries are now paying their fines, which lowers the total upaid level)
+
+```{r, echo=TRUE, fig.width=13, fig.height=7}
+
+df_clean$region_clean <- ifelse(is.na(df_clean$region),6,df_clean$region)
+df_clean$region_clean <- as.factor(df_clean$region_clean)
+levels(df_clean$region_clean) <- c('n_america', 's_america', 'europe', 'asia', 'oceania', 'africa', 'mid_east')
+
+plot_vars(df_clean, 'violations', 'region_clean', 'cat', 'prepost')
+
+```
+
+#### Corruption
+
+One of the key numerical variables to observe is __corruption__. 
+
+What we were able to observe:
+
+1. Corruption has a more positive relationship with the target variable before 2002 than after.
+2. The value for the corruption variable is static, so they are not different between the two snapshots in time. It is strange to want this variable to be static since we would expect that the corruption index changes over time.
+
+```{r, echo=TRUE, fig.width=13, fig.height=7}
+
+plot_vars(df_clean, 'violations', 'corruption', 'numeric', 'prepost')
+
+```
+
+#### Fines
+
+Another key numerical variables to observe is __fines__. We already plotted the relationship between violations and fines earlier, so here we take a look at the relationship between the log transformations of the two variables.
+
+What we were able to observe:
+
+1. There still remains a clear relationsip between the log transformations of the two variables.
+2. The relationships appear to be less linear than before, but the linear estimator is still okay in this case.
+3. If a predictive model were built to predict violations, this is a classic example of data leakage. If you attempt to use __fines__ as a predictor for __violations__, you would not have __fine__ information at the time of prediction. This means that this variable is only available in our data because we are looking at historical data. 
+
+
+```{r, echo=TRUE, fig.width=13, fig.height=7}
+df_clean$log_fines <- log(df_clean$fines +1)
+plot_vars(df_clean, 'violations', 'log_fines', 'numeric', 'prepost')
+
+```
+
+#### Majority Muslim coutry indicator
+
+We are provided in the data set variables for __pctmuslim__ and __majoritymuslim__, which are respectively percent of population that is muslim and a flag that captures whether or not a country is majority muslim. Unfortunately, the levels for the __majoritymuslim__ are not intuitive from the information we were provided, so we created our own flag using the __pctmuslim__ variable.
+
+What we were able to observe:
+
+1. There are a lot more countries in these UN events that were not majority muslim than yes.
+2. We don't learn much information about this variable. Majority muslim appear to have higher log violations, but that different is so small that it is likely due to noise. Majority muslim countries also represent less datapoints in our data, which makes any aggregate information even more succeptible to noise.
+
+```{r, echo=TRUE, fig.width=13, fig.height=7}
+df_clean$maj_musl_ind <- ifelse(is.na(df_clean$pctmuslim), 'missing', ifelse(df_clean$pctmuslim>.5,'yes','no'))
+plot_vars(df_clean, 'violations', 'maj_musl_ind', 'cat', 'prepost')
+
+
+```
+
+#### Trade
+
+What we were able to observe:
+
+1. The relationship between trade and the log transformation of violation is all over the place. We would not trust the linear models in this case.
+
+```{r, echo=TRUE, fig.width=13, fig.height=7}
+
+df_clean$log_trade <- log(df_clean$trade+1)
+plot_vars(df_clean, 'violations', 'log_trade', 'numeric', 'prepost')
+
+
+```
+
+#### Total Cars
+
+What we were able to observe:
+
+1. There a positive relationship between number of total cars and the log transformation of violations. This makes intuitive sense.
+
+```{r, echo=TRUE, fig.width=13, fig.height=7}
+
+plot_vars(df_clean, 'violations', 'cars_total', 'numeric', 'prepost')
+
+
+```
+
 
 <!-- ################################### -->
 <!-- # Keenan's section Begins -->
