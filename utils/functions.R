@@ -12,7 +12,7 @@
 ####################################################################################
 
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(readr, ggplot2, dplyr, reshape, knitr, kableExtra)
+pacman::p_load(readr, ggplot2, dplyr, reshape, knitr, kableExtra, RColorBrewer,corrplot, grid, gridExtra)
 
 ####################################################################################
 # Functions
