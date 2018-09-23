@@ -103,6 +103,24 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
     }
   }
 }
+
+#-----------------------------------------------------------------------------------
+# plot_correlation: 
+#
+#     description:
+#         returns correlation plot for continuous variables
+#
+#-----------------------------------------------------------------------------------
+
+plot_correlation <- function(df_clean, min_unique){
+  df_clean_dropped <- df_clean %>% select(-distUNplz)
+  df_clean_cor <- cor(df_clean_dropped[, unlist(lapply(df_clean_dropped, function(x) is.numeric(x) & length(unique(x))>min_unique))], use='complete.obs')
+  df_clean_cor[is.na(df_clean_cor)] <- 0
+  plot_p <- corrplot(df_clean_cor, method="color",   
+                     type="upper", addCoef.col = "black",tl.col="black", tl.srt=45, sig.level = 0.01, insig = "blank", 
+                     diag=FALSE, number.cex=.5, tl.cex=.7)
+}
+
 # HERE IS A TEMPLATE FOR FUNCTIONS
 #-----------------------------------------------------------------------------------
 # function_name: 
