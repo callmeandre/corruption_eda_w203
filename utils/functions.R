@@ -34,7 +34,7 @@ set_directories <- function(author=author){
   if(author=="Andre"){
     work_dir <- "C:/Users/afern/Desktop/Git/Berkeley/w203/corruption_eda_w203"
   }else if(author=="Keenan"){
-    work_dir <- "Please add yourself to set_directories in functions.R in ~/utils/"
+    work_dir <- "/Users/keenanszulik/Documents/corruption_ed_w203"
   }else if(author=="Erik"){
     work_dir <- "c:/other/mids/w203/homework/lab_1/corruption_eda_w203"
   }else{
