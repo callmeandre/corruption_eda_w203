@@ -390,8 +390,6 @@ Other questions that arose, to which we have incomplete answers, include:
 One final point that we would like to state that, at times, the variables within the provided dataset were presented with limited documentation, which inhibited our ability to perform as robust of an analysis as hoped. 
 
 
-```
-
 <style>
     body .main-container {
         max-width: 1600px;
