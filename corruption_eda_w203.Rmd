@@ -20,14 +20,14 @@ knitr::opts_chunk$set(echo = TRUE)
 This analysis is motivated by the following research question:
 
 \begin{center}
-"If there is any relationship between corruption and parking violations both pre and post 2002 and if there are any other relevant explanatory variables."
+"Is there any relationship between corruption and parking violations both before and after 2002? If so, are there any other relevant explanatory variables?"
 \end{center}
 
-The question will be addressed by exploratory data analysis techniques. We are asked to imagine that we have been hired by the World Bank to explore the influence cultural norms and legal enforcement have on controlling corruption. To operationalize the analysis, the assignment looks at the parking behavior of United Nations officials in Manhattan.
+The question will be addressed by exploratory data analysis techniques. We have been asked to imagine that we were hired by the World Bank to explore the influence cultural norms and legal enforcement have on controlling corruption. To operationalize the analysis, the assignment looks at the parking behavior of United Nations officials in Manhattan.
 
-Until 2002, UN diplomats are protected by diplomatic immunity; therefore, they were not subject to parking enforcement actions and their actions were solely constrained by cultural norms. In 2002, the parking authority acquired the right to confiscate diplomatic license plates of the violateors. As a result, their parking behavior was constrained by both cultural norms and the legal penalties.
+Until 2002, UN diplomats were protected by diplomatic immunity: they were not subject to parking enforcement actions and their actions were solely constrained by cultural norms. In 2002, the parking authority acquired the right to confiscate diplomatic license plates of the violators. As a result, their parking behavior was constrained by both cultural norms and the legal penalties.
 
-We are given a dataset of a selection of UN diplomatic missions, which includes target variable, *violations*, some essential variables for the analysis, such as country codes, label for pre and pos the parking enforcement change, the corruption index, and other variables.
+We have been given a dataset of a selection of UN diplomatic missions, which includes target variable, *violations*, some essential variables for the analysis, such as country codes, a label for before and after the parking enforcement change, the corruption index, and other variables.
 
 <!-- ################################### -->
 <!-- # Maybe include some methodology and caveats here based on how we decided to approach the analysis -->
@@ -39,8 +39,10 @@ First, we load some of the packages we will need for the analysis and the data i
 
 Load the data:
 ```{r, echo=TRUE}
+install.packages('pacman')
 source("utils/functions.R")
-df <- load_rda('data/Corrupt.Rdata')
+df <- load('data/Corrupt.Rdata')
+df <- FMcorrupt
 ```
 
 ### Overview of the data structure
@@ -69,19 +71,19 @@ head(df, 10)
 
 From examining the data summary and the first ten rows, we see  many NA values in the key variable fields, such as violations and corruption. Also notice that, in the field prepost, we have blanks. 
 
-It is necessary to clean the data by taking out the records with the essential fields being blank or NA before starting analysis on the variables:
+It is necessary to clean the data by taking out the records with the blank or NA essential fields before starting analysis on relevant variables:
 
 ```{r}
 df[df=="" | df=="NA"] = NA  #set all the blanks and "NA" to NA
 
-#exlcude the records having NAs in at least one of the essential fields
+#exclude the records having NAs in at least one of the essential fields
 df_clean = subset(df, !is.na(wbcode) & !is.na(prepost) & !is.na(violations) & !is.na(corruption))
 
 ```
 
-One last step before starting univariate analysis of key variables is to make sure in our cleaned dataset, we have exactly two records per country, one pre and one post 2002. Because,
-1. With a missing pre or pos record, it would be difficult to make comparisons of countries' behavior pre and post the policy change. 
-2. Also, if we had some countries having more than one pre and/or one post record, further cleaning or manipulation would have to take place to make sure we appropriately weigh different observations.
+One last step before starting univariate analysis of key variables is to make sure that, in our cleaned dataset, we have exactly two records per country, one before and one after 2002. Because,
+1. With a missing *pre* or *pos* record, it would be difficult to make comparisons of country's behavior pre and post the policy change. 
+2. If we had some countries with more than one pre and/or one post record, further cleaning or manipulation would have to take place to make sure we appropriately weigh different observations.
 
 
 ```{r}
@@ -91,12 +93,12 @@ length(unique(df_clean[df_clean$prepost == "pre",]$wbcode))  #the total number o
 length(unique(df_clean[df_clean$prepost == "pos",]$wbcode))  #the total number of distinct countries in the data set with prepost == "pos"
 
 ```
-From the above numbers, we know that we have a total of `r nrow(df_clean)` observations left in our dataset after cleaning with `r length(unique(df_clean$wbcode))` different counties. Further checking for integrity, we note that, in the dataset, `r length(unique(df_clean[df_clean$prepost == "pre",]$wbcode)) ` unique coutries having prepost field being "pre" and `r length(unique(df_clean[df_clean$prepost == "pos",]$wbcode)) ` unique coutries having prepost field being "pos". Finally, we are sure now that we have a clean enough dataset to start subsequent analysis  
+From the above numbers, we know that we have a total of `r nrow(df_clean)` observations left in our dataset after cleaning with `r length(unique(df_clean$wbcode))` different countries. Further checking for integrity, we note that, in the dataset, `r length(unique(df_clean[df_clean$prepost == "pre",]$wbcode)) ` unique coutries having *prepost* field as *pre* and `r length(unique(df_clean[df_clean$prepost == "pos",]$wbcode)) ` unique countries having prepost field being *pos*. Finally, we are now certain that we have a clean enough dataset to start subsequent analysis  
 
 
 ## Univariate Analysis of Key Variables
 
-Now We start the univariate analysis.
+Now we start the univariate analysis.
 
 ### Variable, Violations
 
@@ -111,10 +113,10 @@ hist(df_clean$violations,20,xlab = "Violations", main = "Histogram of Violations
 There are several features of the variables worth highlighting:
 
 1. All the values are non-negative.
-2. From both the histogram and the numeric summary, we can see that the values are very clustered to the lower end where more than 50% of the values are less than 6.
-3. The distribution is right-skewed with some really big outliers which causes the mean to be greater than the median and relatively high standard deviation, about 302.
+2. From both the histogram and the numeric summary, we can see that the values are very clustered to the lower end: more than 50% of the values are less than 6.
+3. The distribution is right-skewed, with some really big outliers. This causes the mean to be greater than the median, as well as a relatively high standard deviation, about 302.
 
-Since there are `r nrow(df_clean[df_clean$violations == 0,])` zeros with many datapoints clustering close to zero with only a few outliers taking much greater values. Try to draw a histogram of $log(volations + 1)$ to help us better visualize the distribution. While drawing the histogram, we adjust the position of the bins so the first bar is centered around zero. 
+Since there are `r nrow(df_clean[df_clean$violations == 0,])` violation data points with the value of zero—as well as few outliers-a histogram of $log(volations + 1)$ will help us better visualize the distribution. While drawing the histogram, we adjust the position of the bins so the first bar is centered around zero. 
 ```{r}
 nrow(df_clean[df_clean$violations == 0,])
 ```
@@ -122,7 +124,7 @@ nrow(df_clean[df_clean$violations == 0,])
 hist(log(df_clean$violations+1),breaks = seq(-0.75,10,0.5)+0.5, ylim = c(0,50), xlab = "log(Violations+1)", main = "Histogram of Violations")
 ```
 
-Notice that the frequency distribution has two modes one in (-0.25,0.25) and one in (4.25,4.75). This probably is caused by the change of policy where there were more violations before 2002 and less violation after 2002.
+Notice that the frequency distribution has two modes, one in (-0.25,0.25) and one in (4.25,4.75). This probably is caused by the change of policy where there were more violations before 2002 and less violation after 2002.
 
 Two histograms of violations before and after the change of policy prove the assumption.
 ```{r}
@@ -130,9 +132,7 @@ hist(log(df_clean[df_clean$prepost == "pre",]$violations+1),breaks = seq(-0.75,1
 hist(log(df_clean[df_clean$prepost == "pos",]$violations+1),breaks = seq(-0.75,10,0.5)+0.5, ylim = c(0,50), xlab = "log(Violations+1)", main = "Histogram of Violations starting 2002")
 ```
 
-From this above drawing, we demonstrated the shift in the distribution of violation before and after the policy change.
-**!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!do we want to use boxplot??!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!**
-
+From the above graphic, we demonstrated the shift in the distribution of violation before and after the policy change.
 
 ### Variable, Corruption
 
@@ -158,7 +158,7 @@ axis(1, at = seq(-3,2,by=0.5), labels = seq(-3,2,by=0.5))
 
 ```
 
-We notice that the two histograms seem identical, which means most likely, the dataset have corruption as a constant over time. Just to double-check, we test if for each country the corruption is the same pre and post 2002.
+Notice that the two histograms seem identical, which means most likely, the dataset treats corruption as a constant over time. Just to double-check, we test if for each country the corruption is the same pre and post 2002.
 
 ```{r}
 nrow(unique(df_clean[,c("wbcode", "corruption")]))
@@ -171,11 +171,11 @@ boxplot(unique(df_clean[,c("wbcode", "corruption")])$corruption, ylab = "corrupt
 ```
 
 
-Several key feature of the variable, corruption:
+Several key features of the variable *corruption*:
 
-1. Through making sure that the number of unique combinations of wbcode and corruption is the same as the number of unique wbcodes. We are sure that the dataset has corruption as a constant for each country.
-2. We can see that the histogram has two modes one around 0.75 and one around -2.5.
-3. The distribution is left-skewed with most countries having the values between 0 and 1 and not too few outliers cluster close to the second mode.
+1. Through making sure that the number of unique combinations of *wbcode* and *corruption* are the same as the number of unique wbcode's, we are sure that the dataset has corruption as a constant for each country.
+2. We can see that the histogram has two modes: one around 0.75 and another around -2.5.
+3. The distribution is left-skewed, with most countries having the values between 0 and 1. Some outliers cluster close to the second mode.
 4. For corruption, it might be interesting to see if the outliers themselves share some characteristics in common compared to other countries in the dataset.
 
 
@@ -194,7 +194,7 @@ In this section, we will be conducting multivariate analysis on our corruption d
 Here, we do a quick look at correlation of the numerical variables. It appears that most data is static between the two snapshot dates (as mentioned above).
 
 1. Violations and fines are perfectly correlated, so they tell us the same information about the data. We will check to see if they are identical later in this analysis.
-2. Since we know that the prepost variable captures a time element, we will be viewing the correlations in each of the _pre_ and _pos_ subset groups
+2. Since we know that the *prepost* variable captures a time element, we will be viewing the correlations in each of the _pre_ and _pos_ subset groups
 3. Staff, Spouse, and Car Total have a high positive correlation, which makes sense when we think of the semantic meaning of these variables.
 4. GDP and Corruption have a very high negative correlation. This is not a surprising relationship since it's a common hypothesis in the field.
 5. There are many other relationships to look at, but for the sake of brevity, we will end the analysis into the combined data correlations here.
@@ -212,7 +212,7 @@ plot_correlation(df_clean, 10)
 #### Pre and Post 2002
 
 1. The interesting observation from comparing __pre__ and __post__ 2002 correlations is that __milaid__ and __totaid__ show relatively high positive correlations with __violations__ and __fines__. During the __post 2002__ period, that correlation is very weak.
-2. There's a shortage of information about the data, so we will not be able to explain why the correlations are so different between the beforementioned variables during the two snapshots of time
+2. There's a shortage of information about the data, so we will not be able to explain why the correlations are so different between the aforementioned variables during the two snapshots of time.
 
 Here, we will subset out data to _prepost == 'pre'_.
 
@@ -250,17 +250,17 @@ plot(plot_scatter)
 
 ### Deep dive into variable relationships with violations while considering pre-post 2002 timestamp
 
-In this section, we will analyze variables that we believe are important. We will not cover all variable for brevity.
+In this section, we will analyze variables that we believe are important. We will not cover all variables for brevity.
 
 #### Region
 
-One of the key categorical variables to observe is __region__. Although the provided data set only provides an integer factor for the regions, we were able to use the regional indicators to map the integer factors to actual region names. Also, please note that the African country of __Zaire__ had a missing value for __region__. Sice we were able to do a quick internet search and discovered that __Zaire__ is in __Africa__, we fixed the data when creating the __region_clean__ variable.
+One of the key categorical variables to observe is __region__. Although the given data set only provides an integer factor for the regions, we were able to use the regional indicators to map the integer factors to actual region names. Also, please note that the African country of __Zaire__ had a missing value for __region__. Since we were able to do a quick internet search and discovered that __Zaire__ is in __Africa__, we fixed the data when creating the __region_clean__ variable.
 
 What we were able to observe:
 
 1. North America region has the lowest mean __log(violations+1)__ before and after 2002.
 2. Middle East region has the largest interquartile range before and after 2002.
-3. The target variable is much lower after 2002 (as we would expect since countries are now paying their fines, which lowers the total upaid level)
+3. The target variable is much lower after 2002 (as we would expect since countries are now paying their fines, which lowers the total unpaid level)
 
 ```{r, echo=TRUE, fig.width=13, fig.height=7}
 
@@ -293,30 +293,14 @@ Another key numerical variables to observe is __fines__. We already plotted the 
 
 What we were able to observe:
 
-1. There still remains a clear relationsip between the log transformations of the two variables.
+1. There still remains a clear relationship between the log transformations of the two variables.
 2. The relationships appear to be less linear than before, but the linear estimator is still okay in this case.
-3. If a predictive model were built to predict violations, this is a classic example of data leakage. If you attempt to use __fines__ as a predictor for __violations__, you would not have __fine__ information at the time of prediction. This means that this variable is only available in our data because we are looking at historical data. 
+3. If a predictive model were built to predict violations, this is a classic example of data leakage. If you attempt to use __fines__ as a predictor for __violations__, you would not have __fines__ information at the time of prediction. This means that this variable is only available in our data because we are looking at historical data. 
 
 
 ```{r, echo=TRUE, fig.width=13, fig.height=7}
 df_clean$log_fines <- log(df_clean$fines +1)
 plot_vars(df_clean, 'violations', 'log_fines', 'numeric', 'prepost')
-
-```
-
-#### Majority Muslim coutry indicator
-
-We are provided in the data set variables for __pctmuslim__ and __majoritymuslim__, which are respectively percent of population that is muslim and a flag that captures whether or not a country is majority muslim. Unfortunately, the levels for the __majoritymuslim__ are not intuitive from the information we were provided, so we created our own flag using the __pctmuslim__ variable.
-
-What we were able to observe:
-
-1. There are a lot more countries in these UN events that were not majority muslim than yes.
-2. We don't learn much information about this variable. Majority muslim appear to have higher log violations, but that different is so small that it is likely due to noise. Majority muslim countries also represent less datapoints in our data, which makes any aggregate information even more succeptible to noise.
-
-```{r, echo=TRUE, fig.width=13, fig.height=7}
-df_clean$maj_musl_ind <- ifelse(is.na(df_clean$pctmuslim), 'missing', ifelse(df_clean$pctmuslim>.5,'yes','no'))
-plot_vars(df_clean, 'violations', 'maj_musl_ind', 'cat', 'prepost')
-
 
 ```
 
@@ -354,17 +338,59 @@ plot_vars(df_clean, 'violations', 'cars_total', 'numeric', 'prepost')
 
 ### Analysis of Secondary Effects
 
-Fill in with information.
+#### Total Aid
+
+Among the remaining variables provided in the dataset, one of the most fascinating was *totaid*, which was strongly correlated with the number of violations that a given country received before immunity was granted, but became largely neutral after the change in policy.
+
+As we see below, the stark difference in these visualizations (and resultant correlations) demonstrates the strong relationship between the amount of aid that a country received and the number of parking violations it received before the violation policy was altered. This is interesting, as we saw an unclear relationship between the log transformation of violations and that of trade, but we see a much stronger one related to the amount of aid a country receives.
 
 ```{r, echo=TRUE}
+
+plot(log(df_clean[df_clean$prepost == "pre",]$violations + 1), log(df_clean[df_clean$prepost == "pre",]$totaid + 1), xlab = "Log(violations + 1)", ylab = "Log(total aid + 1)", main = "Comparison of total aid vs violations before policy change")
+
+plot(log(df_clean[df_clean$prepost == "pos",]$violations + 1), log(df_clean[df_clean$prepost == "pos",]$totaid + 1), xlab = "Log(violations + 1)", ylab = "Log(total aid + 1)", main = "Comparison of total aid vs violations after policy change")
+
+
 
 ```
 
+Narratively, this could, perhaps, be an illustrative example of the impact of reliance on the United States with the desire to comply with their instituted laws: prior to a more strictly instituted policy, countries that were dependent on foreign aid were highly likely to violate parking regulations; however, after the United States began enforcing their policy, these countries became much more likely to comply.
+
+That said, this could be a false narrative: there is a slightly negative correlation between "totaid" and country GDP, meaning that these violators could decide to better comply with local jurisdiction because they have less tolerance for paying significant fines.
+
+#### Majority Muslim country indicator
+
+We are provided in the data set variables for __pctmuslim__ and __majoritymuslim__, which are respectively percent of population that is muslim and a flag that captures whether or not a country is majority muslim. Unfortunately, the levels for the __majoritymuslim__ are not intuitive from the information we were provided, so we created our own flag using the __pctmuslim__ variable.
+
+What we were able to observe:
+
+1. There are many countries in these UN events that were not majority muslim than those that are.
+2. We are unable to learn much information about this variable. Majority muslim countries appear to have higher log violations, but that difference is so small that it is likely due to noise. Majority muslim countries also represent less points in our data, which makes any aggregate information even more susceptible to noise.
+
+```{r, echo=TRUE, fig.width=13, fig.height=7}
+df_clean$maj_musl_ind <- ifelse(is.na(df_clean$pctmuslim), 'missing', ifelse(df_clean$pctmuslim>.5,'yes','no'))
+plot_vars(df_clean, 'violations', 'maj_musl_ind', 'cat', 'prepost')
+
+
+```
+
+
 ### Conclusion
 
-You can also embed plots, for example:
+After performing our exploratory data analysis on the given dataset on diplomatic parking violations in the United States before and after 2002, we are left to form conclusions to our initial question: is there any relationship between the corruption level of a country and the number of parking violations it received?
 
-```{r, echo=TRUE}
+We learned that we do have robust data detailing the violation history of 149 unique countries before and after the policy change, and that the most common number of violations for a given country was zero. That said, we also saw a large variance in the number of violations that a country may receive, even when looking at countries within the same region. For example, Europe and the Middle East had the largest interquartile ranges of the log transformation of their violation count before 2002, yet showed a dramatic lessening of that range after the policy change.
+
+But what does this mean for our target variables: corruption and violations? We discovered that there is a positive relationship between the number of violations and a country's corruption both before and after 2002. But we also see that the correlation is stronger after 2002. Although countries across the world saw themselves committing fewer parking violations, country's that were more corrupt tended to decrease their violations by less. This confirms that there is a relationship between the level of corruption of a country and the willingness of its diplomats to violate parking laws, though it does not quantify that relationship.
+
+Other questions that arose, to which we have incomplete answers, include: 
+
+1) Is there a relationship between trade with the United States and violations? Not particularly.
+2) Do countries with more cars tend to have more parking violatoins? Typically, yes.
+3) Are countries who receive more aid more sensitive to changes in fine enforcement policies? Dramatically so.
+
+One final point that we would like to make clear is that, at times, the variables within the dataset were presented with limited documentation, which inhibited our ability to performance as robust an analysis as we may have hoped. 
+
 
 ```
 
