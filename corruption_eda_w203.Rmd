@@ -39,7 +39,6 @@ First, we load some of the packages we will need for the analysis and the data i
 
 Load the data:
 ```{r, echo=TRUE}
-install.packages('pacman')
 source("utils/functions.R")
 df <- load_rda('data/Corrupt.Rdata')
 ```
