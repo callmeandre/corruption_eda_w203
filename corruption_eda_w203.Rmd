@@ -41,8 +41,7 @@ Load the data:
 ```{r, echo=TRUE}
 install.packages('pacman')
 source("utils/functions.R")
-df <- load('data/Corrupt.Rdata')
-df <- FMcorrupt
+df <- load_rda('data/Corrupt.Rdata')
 ```
 
 ### Overview of the data structure
