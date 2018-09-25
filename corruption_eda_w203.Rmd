@@ -209,7 +209,7 @@ plot_correlation(df_clean, 10)
 
 #### Pre and Post 2002
 
-1. The interesting observation from comparing __pre__ and __post__ 2002 correlations is that __milaid__ and __totaid__ show relatively high positive correlations with __violations__ and __fines__ pre 2002. Meanwhile, during the __post 2002__ period, that correlation is very weak.
+1. The interesting observation from comparing __pre__ and __post__ 2002 correlations is that __milaid__ and __totaid__ show slight positive correlations with __violations__ and __fines__ pre 2002. Meanwhile, during the __post 2002__ period, those correlations have a near zero *R value*.
 2. There's a shortage of information about the dataset and how variables are captured and defined, so we will not be able to explain why the correlations are so different between the aforementioned variables during the two snapshots of time.
 
 Here, we will subset out data to _prepost == 'pre'_.
