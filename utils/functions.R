@@ -118,7 +118,7 @@ plot_correlation <- function(df_clean, min_unique){
   df_clean_cor[is.na(df_clean_cor)] <- 0
   plot_p <- corrplot(df_clean_cor, method="color",   
                      type="upper", addCoef.col = "black",tl.col="black", tl.srt=45, sig.level = 0.01, insig = "blank", 
-                     diag=FALSE, number.cex=.5, tl.cex=.7)
+                     diag=FALSE, number.cex=.65, tl.cex=.7)
 }
 
 #-----------------------------------------------------------------------------------
