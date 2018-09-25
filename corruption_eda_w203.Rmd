@@ -342,13 +342,15 @@ Among the remaining variables provided in the dataset, one of the most fascinati
 
 As we see below, the stark difference in these visualizations (and resultant correlations) demonstrates the strong relationship between the amount of aid that a country received and the number of parking violations it received before the violation policy was altered. This is interesting, as we saw an unclear relationship between the log transformation of violations and that of trade, but we see a much stronger one related to the amount of aid a country receives.
 
-```{r, echo=TRUE}
+```{r, echo=TRUE, fig.width=13, fig.height=7}
 
-plot(log(df_clean[df_clean$prepost == "pre",]$violations + 1), log(df_clean[df_clean$prepost == "pre",]$totaid + 1), xlab = "Log(violations + 1)", ylab = "Log(total aid + 1)", main = "Comparison of total aid vs violations before policy change")
+# plot(log(df_clean[df_clean$prepost == "pre",]$violations + 1), log(df_clean[df_clean$prepost == "pre",]$totaid + 1), xlab = "Log(violations + 1)", ylab = "Log(total aid + 1)", main = "Comparison of total aid vs violations before policy change")
+# 
+# plot(log(df_clean[df_clean$prepost == "pos",]$violations + 1), log(df_clean[df_clean$prepost == "pos",]$totaid + 1), xlab = "Log(violations + 1)", ylab = "Log(total aid + 1)", main = "Comparison of total aid vs violations after policy change")
+# 
 
-plot(log(df_clean[df_clean$prepost == "pos",]$violations + 1), log(df_clean[df_clean$prepost == "pos",]$totaid + 1), xlab = "Log(violations + 1)", ylab = "Log(total aid + 1)", main = "Comparison of total aid vs violations after policy change")
-
-
+df_clean$log_totaid <- log(df_clean$totaid+1)
+plot_vars(df_clean, 'violations', 'log_totaid', 'numeric', 'prepost')
 
 ```
 
