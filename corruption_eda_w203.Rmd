@@ -28,10 +28,6 @@ Until 2002, UN diplomats were protected by diplomatic immunity: they were not su
 
 We have been given a dataset of a selection of UN diplomatic missions, which includes a target variable, *violations*; a label for before and after the parking enforcement change, *prepost*; and other essential variables, like corruption index and  continent regions.
 
-<!-- ################################### -->
-<!-- # Maybe include some methodology and caveats here based on how we decided to approach the analysis -->
-<!-- ################################### -->
-
 ### Setup
 
 First, we load some of the packages we will need for the analysis and the data into R.
@@ -78,20 +74,28 @@ df_clean = subset(df, !is.na(wbcode) & !is.na(prepost) & !is.na(violations) & !i
 
 ```
 
+Do another count row, we note that the number of observations dropped in the cleaning process was `r nrow(df)-nrow(df_clean)`
+
+```{r}
+nrow(df)-nrow(df_clean) #number of observations dropped when cleaning data
+```
+
 One last step before starting univariate analysis of key variables is to make sure that, in our cleaned dataset, we have exactly two records per country, one before and one after 2002. Because,
 
 1. With a missing *pre* or *pos* record, it would be difficult to compare country behavior pre and post the policy change. 
-2. If we countries had more than one pre and/or one post record, further cleaning or manipulation would be required to appropriately weigh different observations.
+2. If the dataset includes countries that had more than one pre and/or one post record, further cleaning or manipulation would be required to appropriately weigh different observations.
 
 
 ```{r}
-nrow(df_clean)  #the total number observations in the data set
-length(unique(df_clean$wbcode))  #the total number of unique countries
 length(unique(df_clean[df_clean$prepost == "pre",]$wbcode))  #the total number of distinct countries in the data set with prepost == "pre"
 length(unique(df_clean[df_clean$prepost == "pos",]$wbcode))  #the total number of distinct countries in the data set with prepost == "pos"
-
+length(unique(df_clean$wbcode))  #the total number of unique countries
+nrow(df_clean)  #the total number observations in the data set
 ```
-We now have a total of `r nrow(df_clean)` observations left in our dataset after cleaning with `r length(unique(df_clean$wbcode))` different countries. Further checking for integrity, we note that, in the dataset, `r length(unique(df_clean[df_clean$prepost == "pre",]$wbcode)) ` unique coutries having *prepost* field as *pre* and `r length(unique(df_clean[df_clean$prepost == "pos",]$wbcode)) ` unique countries having prepost field being *pos*. Finally, we are comfortable enough with the dataset to begin variable-specifc analysis.
+
+From the above counts, we note that, in the dataset, `r length(unique(df_clean[df_clean$prepost == "pre",]$wbcode)) ` unique coutries having *prepost* field as *pre* and `r length(unique(df_clean[df_clean$prepost == "pos",]$wbcode)) ` unique countries having prepost field being *pos*. Because we know that we have exactly `r length(unique(df_clean$wbcode))` different countries in the dataset, so we can conclude, we have `r length(unique(df_clean$wbcode))` unique countries with each of them having one pre and one post record. There are no duplicates because the 2 times `r length(unique(df_clean$wbcode))` is equal to the total observation count of `r nrow(df_clean)`.
+
+Finally, we have made sure our dataset is clean enough for our subseqent analysis.
 
 
 ## Univariate Analysis of Key Variables
@@ -111,10 +115,10 @@ hist(df_clean$violations,20,xlab = "Violations", main = "Histogram of Violations
 There are several features of the variables worth highlighting:
 
 1. All the values are non-negative.
-2. From both the histogram and the numeric summary, we can see that the values are very clustered to the lower end: more than 50% of the values are less than 6.
+2. From both the histogram and the numeric summary, we can see that the values are very clustered on the lower end: more than 50% of the values are less than 6.
 3. The distribution is right-skewed, with large outliers. This causes the mean to be greater than the median and a high standard deviation, around 302.
 
-Since there are `r nrow(df_clean[df_clean$violations == 0,])` violation data points with the value of zero, as well as outliers--a histogram of $log(volations + 1)$ will help us better visualize the distribution. While drawing the histogram, we adjust the position of the bins so the first bar is centered around zero. 
+Since there are `r nrow(df_clean[df_clean$violations == 0,])` violation data points with the value of zero, as well as outliers--a histogram of $log(volations + 1)$ will help us better visualize the distribution. While drawing the histogram, we adjust the positions of the bins so the first bar is centered around zero. 
 ```{r}
 nrow(df_clean[df_clean$violations == 0,])
 ```
@@ -122,7 +126,7 @@ nrow(df_clean[df_clean$violations == 0,])
 hist(log(df_clean$violations+1),breaks = seq(-0.75,10,0.5)+0.5, ylim = c(0,50), xlab = "log(Violations+1)", main = "Histogram of Violations")
 ```
 
-Notice that the frequency distribution appears to have two local peaks (bimodal), one in (-0.25,0.25) and one in (4.25,4.75). This probably is caused by the change of policy where there were more violations before 2002 and less violation after 2002. We will inspect this further.
+Notice that the frequency distribution appears to have two local peaks, one in (-0.25,0.25) and one in (4.25,4.75). This probably is caused by the change of policy where there were more violations before 2002 and less violation after 2002. We will inspect this further.
 
 Two histograms of violations before and after the change of policy prove the assumption.
 ```{r}
@@ -162,19 +166,12 @@ Note that the two histograms appear identical, which likely means that this data
 nrow(unique(df_clean[,c("wbcode", "corruption")]))
 ```
 
-Draw a boxplot of corruption:
-
-```{r}
-boxplot(unique(df_clean[,c("wbcode", "corruption")])$corruption, ylab = "corruption")
-```
-
-
 Several key features of the variable *corruption*:
 
-1. Through making sure that the number of unique combinations of *wbcode* and *corruption* are the same as the number of unique wbcode's, we are sure that the dataset has corruption as a constant for each country.
-2. We can see that the histogram appears to have two local peaks (bimodal): one at around 0.75 and another at around -2.5.
-3. This distribution is left-skewed, with most countries having the values between 0 and 1. Some outliers cluster close to the second mode.
-4. For corruption, it could be interesting to see if the outliers share characteristics with a group of countries in the dataset.
+1. Through making sure that the number of unique combinations of *wbcode* and *corruption* is the same as the number of unique wbcodes, we are sure that the dataset has corruption as a constant for each country over time.
+2. We can see that the histogram appears to have two local peaks: one at around 0.75 and another at around -2.5.
+3. This distribution is left-skewed, with most countries having the values between 0 and 1.
+4. Some outliers cluster close to the lower local peak at -2.5.
 
 
 <!-- ################################### -->
