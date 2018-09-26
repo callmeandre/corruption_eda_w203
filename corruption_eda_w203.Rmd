@@ -341,11 +341,6 @@ As we see below, the stark difference in these visualizations (and resultant cor
 
 ```{r, echo=TRUE, fig.width=13, fig.height=7}
 
-# plot(log(df_clean[df_clean$prepost == "pre",]$violations + 1), log(df_clean[df_clean$prepost == "pre",]$totaid + 1), xlab = "Log(violations + 1)", ylab = "Log(total aid + 1)", main = "Comparison of total aid vs violations before policy change")
-# 
-# plot(log(df_clean[df_clean$prepost == "pos",]$violations + 1), log(df_clean[df_clean$prepost == "pos",]$totaid + 1), xlab = "Log(violations + 1)", ylab = "Log(total aid + 1)", main = "Comparison of total aid vs violations after policy change")
-# 
-
 df_clean$log_totaid <- log(df_clean$totaid+1)
 plot_vars(df_clean, 'violations', 'log_totaid', 'numeric', 'prepost')
 
