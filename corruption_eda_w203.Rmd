@@ -371,8 +371,8 @@ plot_vars(df_clean, 'violations', 'maj_musl_ind', 'cat', 'prepost')
 An additional way of framing the question of the number of violations by the diplomats of a given country, relative to that country's level of corruption, is by looking at the number of violations per staff member. Logically, a country with more individuals at risk of violating parking policy will be more likely to more likely to, in fact, violate parking policy, but we see a surprisingly strong trend when viewing the log transformation of this variable relative to corruption.
 
 ```{r, echo=TRUE, fig.width=13, fig.height=7}
-df_clean$log_violations_per_staff <- log((df_clean$violations / df_clean$staff) + 1)
-plot_vars(df_clean, 'log_violations_per_staff', 'corruption', 'numeric', 'prepost')
+df_clean$violations_per_staff <- (df_clean$violations / df_clean$staff)
+plot_vars(df_clean, 'violations_per_staff', 'corruption', 'numeric', 'prepost')
 
 ```
 
