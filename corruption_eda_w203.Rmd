@@ -93,7 +93,7 @@ length(unique(df_clean$wbcode))  #the total number of unique countries
 nrow(df_clean)  #the total number observations in the data set
 ```
 
-From the above counts, we note that, in the dataset, `r length(unique(df_clean[df_clean$prepost == "pre",]$wbcode)) ` unique coutries having *prepost* field as *pre* and `r length(unique(df_clean[df_clean$prepost == "pos",]$wbcode)) ` unique countries having prepost field being *pos*. Because we know that we have exactly `r length(unique(df_clean$wbcode))` different countries in the dataset, so we can conclude, we have `r length(unique(df_clean$wbcode))` unique countries with each of them having one pre and one post record. There is no duplicates because the 2 times `r length(unique(df_clean$wbcode))` is equal to the total observation count of `r nrow(df_clean)`.
+From the above counts, we note that, in the dataset, `r length(unique(df_clean[df_clean$prepost == "pre",]$wbcode)) ` unique coutries having *prepost* field as *pre* and `r length(unique(df_clean[df_clean$prepost == "pos",]$wbcode)) ` unique countries having prepost field being *pos*. Because we know that we have exactly `r length(unique(df_clean$wbcode))` different countries in the dataset, so we can conclude, we have `r length(unique(df_clean$wbcode))` unique countries with each of them having one pre and one post record. There are no duplicates because the 2 times `r length(unique(df_clean$wbcode))` is equal to the total observation count of `r nrow(df_clean)`.
 
 Finally, we have made sure our dataset is clean enough for our subseqent analysis.
 
@@ -166,12 +166,12 @@ Note that the two histograms appear identical, which likely means that this data
 nrow(unique(df_clean[,c("wbcode", "corruption")]))
 ```
 
-
 Several key features of the variable *corruption*:
 
-1. Through making sure that the number of unique combinations of *wbcode* and *corruption* are the same as the number of unique wbcode's, we are sure that the dataset has corruption as a constant for each country.
+1. Through making sure that the number of unique combinations of *wbcode* and *corruption* is the same as the number of unique wbcodes, we are sure that the dataset has corruption as a constant for each country over time.
 2. We can see that the histogram appears to have two local peaks: one at around 0.75 and another at around -2.5.
-3. This distribution is left-skewed, with most countries having the values between 0 and 1. Some outliers cluster close to the second mode.
+3. This distribution is left-skewed, with most countries having the values between 0 and 1.
+4. Some outliers cluster close to the lower local peak at -2.5.
 
 
 <!-- ################################### -->
