@@ -206,7 +206,7 @@ plot_correlation(df_clean, 10)
 
 #### Pre and Post 2002
 
-1. The interesting observation from comparing __pre__ and __post__ 2002 correlations is that __milaid__ and __totaid__ show relatively high positive correlations with __violations__ and __fines__ pre 2002. Meanwhile, during the __post 2002__ period, that correlation is very weak.
+1. The interesting observation from comparing __pre__ and __post__ 2002 correlations is that __milaid__ and __totaid__ show slight positive correlations with __violations__ and __fines__ pre 2002. Meanwhile, during the __post 2002__ period, those correlations have a near zero *R value*.
 2. There's a shortage of information about the dataset and how variables are captured and defined, so we will not be able to explain why the correlations are so different between the aforementioned variables during the two snapshots of time.
 
 Here, we will subset out data to _prepost == 'pre'_.
@@ -335,17 +335,19 @@ plot_vars(df_clean, 'violations', 'cars_total', 'numeric', 'prepost')
 
 #### Total Aid
 
-Among the remaining variables provided in the dataset, one of the most fascinating was *totaid*, which was strongly correlated with the number of violations that a given country received before immunity was granted, but became largely neutral after the change in policy.
+Among the remaining variables provided in the dataset, one of the most fascinating was *totaid*, which was slightly correlated with the number of violations that a given country received before immunity was granted, but became largely neutral after the change in policy.
 
-As we see below, the stark difference in these visualizations (and resultant correlations) demonstrates the strong relationship between the amount of aid that a country received and the number of parking violations it received before the violation policy was altered. This is interesting, as we saw an unclear relationship between the log transformation of violations and that of trade, but we see a much stronger one related to the amount of aid a country receives.
+As we see below, the stark difference in these visualizations (and resultant correlations) demonstrates the strong relationship between the amount of aid that a country received and the number of parking violations it received before the violation policy was altered. This is interesting, as we saw an unclear relationship between the log transformation of violations and that of trade, but we see one related to the amount of aid a country receives.
 
-```{r, echo=TRUE}
+```{r, echo=TRUE, fig.width=13, fig.height=7}
 
-plot(log(df_clean[df_clean$prepost == "pre",]$violations + 1), log(df_clean[df_clean$prepost == "pre",]$totaid + 1), xlab = "Log(violations + 1)", ylab = "Log(total aid + 1)", main = "Comparison of total aid vs violations before policy change")
+# plot(log(df_clean[df_clean$prepost == "pre",]$violations + 1), log(df_clean[df_clean$prepost == "pre",]$totaid + 1), xlab = "Log(violations + 1)", ylab = "Log(total aid + 1)", main = "Comparison of total aid vs violations before policy change")
+# 
+# plot(log(df_clean[df_clean$prepost == "pos",]$violations + 1), log(df_clean[df_clean$prepost == "pos",]$totaid + 1), xlab = "Log(violations + 1)", ylab = "Log(total aid + 1)", main = "Comparison of total aid vs violations after policy change")
+# 
 
-plot(log(df_clean[df_clean$prepost == "pos",]$violations + 1), log(df_clean[df_clean$prepost == "pos",]$totaid + 1), xlab = "Log(violations + 1)", ylab = "Log(total aid + 1)", main = "Comparison of total aid vs violations after policy change")
-
-
+df_clean$log_totaid <- log(df_clean$totaid+1)
+plot_vars(df_clean, 'violations', 'log_totaid', 'numeric', 'prepost')
 
 ```
 
@@ -383,11 +385,10 @@ Other questions that arose, to which we have incomplete answers, include:
 1) Is there a relationship between trade with the United States and violations? Not particularly.
 2) Do country diplomats bringing higher total cars to the UN tend to have more parking violations? Typically, yes.
 3) Are countries who receive more aid more sensitive to changes in fine enforcement policies? Dramatically so.
+4) Was there a language barrier between non-English speaking countries and the law enforcement of the United States that may have caused more confusion around diplomatic parking policy?
 
 One final point that we would like to state that, at times, the variables within the provided dataset were presented with limited documentation, which inhibited our ability to perform as robust of an analysis as hoped. 
 
-
-```
 
 <style>
     body .main-container {
