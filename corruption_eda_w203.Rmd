@@ -195,7 +195,7 @@ Here, we do a quick look at correlation of the numerical variables. It appears t
 5. There are many other relationships to look at, but for the sake of brevity, we will end the analysis into the combined data correlations here.
 
 
-_The plot_correlation function was moved to the functions.R file_
+_The plot_correlation function was moved to the functions.R file. In it, we use the **cor function** with the following parameter **use="pairwise.complete.obs"** in order to drop the minimal number of observations when computing the correlations between two variables. Also, I only calculate the correlation for variables with the attribute **is.numeric(x)==TRUE** AND **length(unique(x))>10**, to keep factor variables from being calculated as numeric, AND we exclude the variable **distUNplz** since we could not figure out its definition with the provided information._
 
 ```{r, echo=TRUE, fig.width=13, fig.height=7}
 
